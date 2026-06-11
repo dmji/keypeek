@@ -91,21 +91,18 @@ pub fn behavior_to_layout_key(behavior: &Behavior) -> Option<LayoutKey> {
             kind: KeycodeKind::Special,
             ..Default::default()
         }),
-        Behavior::Bluetooth { command, .. } => {
+        Behavior::Bluetooth { command, value } => {
             let label = match *command {
-                0 => "BT Clr",
-                1 => "BT Nxt",
-                2 => "BT Prv",
-                n => {
-                    return Some(LayoutKey {
-                        tap: Label::new(format!("BT {}", n)),
-                        kind: KeycodeKind::Special,
-                        ..Default::default()
-                    })
-                }
+                0 => Label::new("BT Clr"),
+                1 => Label::new("BT Nxt"),
+                2 => Label::new("BT Prv"),
+                3 => Label::with_short(format!("BT Sel {}", value), format!("BT{}", value)),
+                4 => Label::with_short("BT Clr All", "BTClr"),
+                5 => Label::with_short(format!("BT Disc {}", value), format!("BTD{}", value)),
+                n => Label::new(format!("BT {}", n)),
             };
             Some(LayoutKey {
-                tap: Label::new(label),
+                tap: label,
                 kind: KeycodeKind::Special,
                 ..Default::default()
             })
