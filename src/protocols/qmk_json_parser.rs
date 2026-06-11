@@ -119,7 +119,8 @@ fn collect_layout_keys(layout: &Value) -> Result<Vec<Key>, Box<dyn Error>> {
         let w = key["w"].as_f64().unwrap_or(1.0) as f32;
         let h = key["h"].as_f64().unwrap_or(1.0) as f32;
 
-        // Keypeek does not support rotated keys, so we recalculate the position adjusted for rotation around the pivot point.
+        // Position is where the key's center lands after rotating around the pivot;
+        // the rotation itself is applied at render time via `r`.
         let angle_deg = key.get("r").and_then(|v| v.as_f64()).unwrap_or(0.0) as f32;
         let pivot_x = key
             .get("rx")
@@ -142,6 +143,7 @@ fn collect_layout_keys(layout: &Value) -> Result<Vec<Key>, Box<dyn Error>> {
             y,
             w,
             h,
+            r: angle_deg,
         });
     }
 
