@@ -22,7 +22,7 @@ pub struct VialProtocol {
 
 impl VialProtocol {
     pub fn connect(vid: u16, pid: u16) -> Result<Self, Box<dyn Error>> {
-        let api = KeyboardApi::new(vid, pid, 0xff60)
+        let api = KeyboardApi::new(vid, pid, 0xff60, None)
             .map_err(|e| format!("Failed to connect to device ({vid:04x}:{pid:04x}): {e}"))?;
 
         Self::init_from_api(api, vid, pid)
