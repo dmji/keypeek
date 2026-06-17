@@ -111,7 +111,7 @@ pub struct RawHidSubscription {
 
 impl RawHidSubscription {
     pub fn open(vid: u16, pid: u16) -> Option<Box<dyn SubscriptionSender>> {
-        KeyboardApi::new(vid, pid, 0xff6, None)
+        KeyboardApi::new(vid, pid, 0xff60, None)
             .ok()
             .map(|api| Box::new(Self { api }) as Box<dyn SubscriptionSender>)
     }

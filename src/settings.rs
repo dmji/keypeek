@@ -277,7 +277,7 @@ impl Settings {
             s.margin = val.parse().unwrap_or(s.margin);
         }
         for index in 0..s.theme.layer_colors.len() {
-            if let Some(val) = section.get(&format!("layer_color_{index}")) {
+            if let Some(val) = section.get(format!("layer_color_{index}")) {
                 if let Ok(parsed) = val.parse() {
                     s.theme.layer_colors[index] = parsed;
                 }

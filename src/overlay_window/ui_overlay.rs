@@ -130,8 +130,10 @@ impl OverlayApp {
             } else {
                 format!("{}\n{}", shifted, key.tap.full)
             };
-            let mut job = egui::text::LayoutJob::default();
-            job.halign = egui::Align::Center;
+            let mut job = egui::text::LayoutJob {
+                halign: egui::Align::Center,
+                ..Default::default()
+            };
             job.append(&text, 0.0, egui::TextFormat::simple(font, color));
             return (None, Some(ui.painter().layout_job(job)));
         }
@@ -139,19 +141,14 @@ impl OverlayApp {
         if let Some(symbol) = &key.symbol {
             let symbol_font = egui::FontId::proportional(0.33 * size * font_scale);
             let symbol_galley = create_galley(symbol.clone(), symbol_font);
+            let gap = 0.06 * size;
 
-            if !key.tap.is_empty() {
-                let text_galley = create_galley(key.tap.full.clone(), font.clone());
-                let gap = 0.06 * size;
-                let total_width = symbol_galley.rect.width() + gap + text_galley.rect.width();
-                if total_width <= max_width {
-                    return (Some(symbol_galley), Some(text_galley));
-                }
-            }
-
-            if let Some(short) = &key.tap.short {
-                let text_galley = create_galley(short.clone(), font.clone());
-                let gap = 0.06 * size;
+            let candidates = [
+                (!key.tap.is_empty()).then(|| key.tap.full.clone()),
+                key.tap.short.clone(),
+            ];
+            for text in candidates.into_iter().flatten() {
+                let text_galley = create_galley(text, font.clone());
                 let total_width = symbol_galley.rect.width() + gap + text_galley.rect.width();
                 if total_width <= max_width {
                     return (Some(symbol_galley), Some(text_galley));
