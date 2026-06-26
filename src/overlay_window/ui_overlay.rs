@@ -2,6 +2,7 @@ use super::state::{KeyColors, LabelGalleys};
 use super::OverlayApp;
 use crate::keyboard::Keyboard;
 use crate::layout_key::{BorderStyle, KeycodeKind, LayoutKey};
+use crate::layout_language;
 use crate::settings::ThemeColor;
 use eframe::egui::{self, Window};
 
@@ -458,6 +459,7 @@ impl OverlayApp {
 
                     let layout_key = keyboard
                         .get_key(effective_layer as usize, key.row, key.col)
+                        .map(|k| layout_language::localize_layout_key(&k, self.ui.current_language))
                         .unwrap_or_default();
 
                     let first_layer_key_kind = keyboard

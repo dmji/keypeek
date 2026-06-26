@@ -241,6 +241,13 @@ impl OverlayApp {
                                 "Fit long labels to available space",
                             );
                             ui.end_row();
+
+                            ui.label("Key labels language");
+                            ui.checkbox(
+                                &mut self.settings.draft.auto_switch_labels,
+                                "Auto-switch with system language (EN/RU)",
+                            );
+                            ui.end_row();
                         });
                 });
 

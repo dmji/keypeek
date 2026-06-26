@@ -1,6 +1,7 @@
 use crate::connection::ConnectionTask;
 use crate::device_discovery::DiscoveredDevice;
 use crate::keyboard::Keyboard;
+use crate::layout_language::LayoutLanguage;
 use crate::protocols::{ConnectionSpec, KeyboardDefinition, Reopener};
 use crate::settings::{ProtocolType, Settings};
 
@@ -57,6 +58,7 @@ pub struct UiState {
     pub settings_visible: bool,
     pub settings_error: Option<String>,
     pub settings_warning: Option<String>,
+    pub current_language: LayoutLanguage,
     pub mouse_passthrough: Option<bool>,
     #[cfg(target_os = "macos")]
     pub macos_maximized: bool,

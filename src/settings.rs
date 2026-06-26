@@ -168,6 +168,7 @@ pub struct Settings {
     pub size: i32,
     pub font_size_multiplier: f32,
     pub auto_fit_before_ellipsis: bool,
+    pub auto_switch_labels: bool,
     pub position: WindowPosition,
     pub timeout: i64,
     pub margin: u32,
@@ -180,6 +181,7 @@ impl Default for Settings {
             size: 60,
             font_size_multiplier: 1.0,
             auto_fit_before_ellipsis: false,
+            auto_switch_labels: false,
             position: WindowPosition::BottomRight,
             timeout: 2000,
             margin: 10,
@@ -236,6 +238,10 @@ impl Settings {
             "auto_fit_before_ellipsis",
             self.auto_fit_before_ellipsis.to_string(),
         );
+        section.set(
+            "auto_switch_labels",
+            self.auto_switch_labels.to_string(),
+        );
         section.set("position", self.position.to_string());
         section.set("timeout", self.timeout.to_string());
         section.set("margin", self.margin.to_string());
@@ -259,6 +265,9 @@ impl Settings {
         }
         if let Some(val) = section.get("auto_fit_before_ellipsis") {
             s.auto_fit_before_ellipsis = val.parse().unwrap_or(s.auto_fit_before_ellipsis);
+        }
+        if let Some(val) = section.get("auto_switch_labels") {
+            s.auto_switch_labels = val.parse().unwrap_or(s.auto_switch_labels);
         }
         if let Some(val) = section.get("position") {
             if let Ok(parsed) = val.parse() {

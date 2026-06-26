@@ -37,6 +37,7 @@ impl OverlayApp {
                 settings_visible: true,
                 settings_error: None,
                 settings_warning: None,
+                current_language: crate::layout_language::LayoutLanguage::English,
                 mouse_passthrough: None,
                 #[cfg(target_os = "macos")]
                 macos_maximized: false,
@@ -95,6 +96,18 @@ impl OverlayApp {
             });
     }
 
+    fn detect_language(&mut self, ctx: &egui::Context) {
+        if !self.settings.active.auto_switch_labels {
+            return;
+        }
+        let detected = crate::platform::current_layout_language();
+        if detected != self.ui.current_language {
+            self.ui.current_language = detected;
+            ctx.request_repaint();
+        }
+        ctx.request_repaint_after(std::time::Duration::from_millis(200));
+    }
+
     fn schedule_overlay_hide_repaint(&self, ctx: &egui::Context) {
         if self.ui.settings_visible {
             return;
@@ -147,6 +160,7 @@ impl eframe::App for OverlayApp {
         self.maintain_connection(ctx);
         self.apply_live_visual_settings();
         self.apply_live_layout_settings();
+        self.detect_language(ctx);
         self.ui.file_dialog.update(ctx);
 
         if let Some(path) = self.ui.file_dialog.take_picked() {
