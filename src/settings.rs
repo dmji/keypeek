@@ -133,6 +133,7 @@ impl FromStr for ThemeColor {
 pub struct ThemeSettings {
     pub layer_colors: [ThemeColor; 7],
     pub font_color: ThemeColor,
+    pub finger_zone_colors: [ThemeColor; 9],
 }
 
 impl ThemeSettings {
@@ -159,6 +160,17 @@ impl Default for ThemeSettings {
                 ThemeColor::new(127, 127, 127, ALPHA),
             ],
             font_color: ThemeColor::new(255, 255, 255, 255),
+            finger_zone_colors: [
+                ThemeColor::new(200, 70, 70, ALPHA),   // Left Pinky
+                ThemeColor::new(200, 130, 50, ALPHA),  // Left Ring
+                ThemeColor::new(140, 180, 60, ALPHA),  // Left Middle
+                ThemeColor::new(70, 150, 200, ALPHA),  // Left Index
+                ThemeColor::new(70, 180, 180, ALPHA),  // Right Index
+                ThemeColor::new(140, 180, 60, ALPHA),  // Right Middle
+                ThemeColor::new(200, 130, 50, ALPHA),  // Right Ring
+                ThemeColor::new(170, 90, 170, ALPHA),  // Right Pinky
+                ThemeColor::new(120, 120, 120, ALPHA), // Thumb
+            ],
         }
     }
 }
@@ -169,6 +181,7 @@ pub struct Settings {
     pub font_size_multiplier: f32,
     pub auto_fit_before_ellipsis: bool,
     pub auto_switch_labels: bool,
+    pub color_by_finger_zone: bool,
     pub position: WindowPosition,
     pub timeout: i64,
     pub margin: u32,
@@ -182,6 +195,7 @@ impl Default for Settings {
             font_size_multiplier: 1.0,
             auto_fit_before_ellipsis: false,
             auto_switch_labels: false,
+            color_by_finger_zone: false,
             position: WindowPosition::BottomRight,
             timeout: 2000,
             margin: 10,
@@ -242,6 +256,10 @@ impl Settings {
             "auto_switch_labels",
             self.auto_switch_labels.to_string(),
         );
+        section.set(
+            "color_by_finger_zone",
+            self.color_by_finger_zone.to_string(),
+        );
         section.set("position", self.position.to_string());
         section.set("timeout", self.timeout.to_string());
         section.set("margin", self.margin.to_string());
@@ -249,6 +267,9 @@ impl Settings {
             section.set(format!("layer_color_{index}"), color.to_string());
         }
         section.set("font_color", self.theme.font_color.to_string());
+        for (index, color) in self.theme.finger_zone_colors.iter().enumerate() {
+            section.set(format!("finger_zone_color_{index}"), color.to_string());
+        }
         conf.write_to_file(path)
     }
 
@@ -268,6 +289,9 @@ impl Settings {
         }
         if let Some(val) = section.get("auto_switch_labels") {
             s.auto_switch_labels = val.parse().unwrap_or(s.auto_switch_labels);
+        }
+        if let Some(val) = section.get("color_by_finger_zone") {
+            s.color_by_finger_zone = val.parse().unwrap_or(s.color_by_finger_zone);
         }
         if let Some(val) = section.get("position") {
             if let Ok(parsed) = val.parse() {
@@ -295,6 +319,13 @@ impl Settings {
         if let Some(val) = section.get("font_color") {
             if let Ok(parsed) = val.parse() {
                 s.theme.font_color = parsed;
+            }
+        }
+        for index in 0..s.theme.finger_zone_colors.len() {
+            if let Some(val) = section.get(format!("finger_zone_color_{index}")) {
+                if let Ok(parsed) = val.parse() {
+                    s.theme.finger_zone_colors[index] = parsed;
+                }
             }
         }
         Some(s)

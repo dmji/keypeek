@@ -457,10 +457,20 @@ impl OverlayApp {
                     let (effective_layer, is_background_key) =
                         keyboard.get_effective_key_layer(key.row, key.col);
 
-                    let layout_key = keyboard
+                    let raw_key = keyboard
                         .get_key(effective_layer as usize, key.row, key.col)
-                        .map(|k| layout_language::localize_layout_key(&k, self.ui.current_language))
                         .unwrap_or_default();
+
+                    let finger_zone = if self.settings.active.color_by_finger_zone {
+                        crate::finger_zone::zone_by_position(key, &keyboard.layout.keys)
+                    } else {
+                        None
+                    };
+
+                    let layout_key = layout_language::localize_layout_key(
+                        &raw_key,
+                        self.ui.current_language,
+                    );
 
                     let first_layer_key_kind = keyboard
                         .get_key(0, key.row, key.col)
@@ -469,7 +479,7 @@ impl OverlayApp {
 
                     let pressed = keyboard.is_key_pressed(key.row, key.col);
                     let KeyColors {
-                        fill: fill_color,
+                        fill: mut fill_color,
                         border: stroke_color,
                         border_thickness,
                         font: font_color,
@@ -479,6 +489,21 @@ impl OverlayApp {
                         is_background_key,
                         pressed,
                     );
+
+                    if let Some(zone) = finger_zone {
+                        let zone_color = self.settings.active.theme.finger_zone_colors
+                            [zone.index()];
+                        fill_color = Self::to_egui_color(zone_color);
+                        if is_background_key && effective_layer != 0 {
+                            let layer0 = Self::to_egui_color(
+                                self.settings.active.theme.layer_colors[0],
+                            );
+                            fill_color = fill_color.lerp_to_gamma(layer0, 0.7);
+                        }
+                        if pressed {
+                            fill_color = fill_color.lerp_to_gamma(egui::Color32::WHITE, 0.2);
+                        }
+                    }
 
                     let rect = egui::Rect::from_min_size(
                         egui::pos2(key.x * size, key.y * size) + window_pos.to_vec2(),

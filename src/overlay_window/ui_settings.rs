@@ -248,6 +248,13 @@ impl OverlayApp {
                                 "Auto-switch with system language (EN/RU)",
                             );
                             ui.end_row();
+
+                            ui.label("Key coloring");
+                            ui.checkbox(
+                                &mut self.settings.draft.color_by_finger_zone,
+                                "Color by touch-typing finger zone",
+                            );
+                            ui.end_row();
                         });
                 });
 
@@ -303,6 +310,27 @@ impl OverlayApp {
                                 &mut self.settings.draft.theme.layer_colors[6],
                             );
                         });
+                    });
+
+                    ui.separator();
+                    ui.add_space(4.0);
+                    let finger_zone_names = [
+                        "L. Pinky", "L. Ring", "L. Middle", "L. Index",
+                        "R. Index", "R. Middle", "R. Ring", "R. Pinky", "Thumb",
+                    ];
+                    ui.heading("Finger Zone Colors");
+                    ui.add_space(4.0);
+                    ui.columns(2, |columns| {
+                        for (i, name) in finger_zone_names.iter().enumerate() {
+                            let col = i / 5;
+                            columns[col].vertical(|ui| {
+                                Self::theme_color_entry(
+                                    ui,
+                                    name,
+                                    &mut self.settings.draft.theme.finger_zone_colors[i],
+                                );
+                            });
+                        }
                     });
                 });
 
